@@ -35,7 +35,14 @@ image-cozystack:
 
 image-talos:
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
+ifeq ($(PUSH),1)
 	skopeo copy docker-archive:../../../_out/assets/installer-amd64.tar docker://$(REGISTRY)/talos:$(call settag,$(TALOS_VERSION))
+else ifeq ($(LOAD),1)
+	docker load -i ../../../_out/assets/installer-amd64.tar
+	docker tag $$(docker load -i ../../../_out/assets/installer-amd64.tar | grep -oP '(?<=Loaded image: ).*') $(REGISTRY)/talos:$(call settag,$(TALOS_VERSION))
+else
+	@echo "Skipping talos image push/load (PUSH=0, LOAD=0)"
+endif
 
 image-matchbox:
 	test -f ../../../_out/assets/kernel-amd64 || make talos-kernel

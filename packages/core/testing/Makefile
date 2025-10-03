@@ -21,8 +21,13 @@ image-e2e-sandbox:
 		--cache-to type=inline \
 		--metadata-file images/e2e-sandbox.json \
 		$(BUILDX_ARGS)
-	IMAGE="$(REGISTRY)/e2e-sandbox:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/e2e-sandbox.json -o json -r)" \
+ifeq ($(PUSH),1)
+	IMAGE="$(REGISTRY)/e2e-sandbox:$(call settag,$(TAG))@$$(yq e '.\"containerimage.digest\"' images/e2e-sandbox.json -o json -r)" \
 		yq -i '.e2e.image = strenv(IMAGE)' values.yaml
+else
+	IMAGE="$(REGISTRY)/e2e-sandbox:$(call settag,$(TAG))" \
+		yq -i '.e2e.image = strenv(IMAGE)' values.yaml
+endif
 	rm -f images/e2e-sandbox.json
 
 test: test-cluster test-openapi test-apps ## Run the end-to-end tests in existing sandbox
