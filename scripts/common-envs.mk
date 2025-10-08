@@ -1,4 +1,4 @@
-REGISTRY ?= ghcr.io/cozystack/cozystack
+REGISTRY ?= harbor.voidbox.io/maxcloud
 TAG = $(shell git describe --tags --exact-match 2>/dev/null || echo latest)
 PUSH := 1
 LOAD := 0
